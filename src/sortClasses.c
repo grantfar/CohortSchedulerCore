@@ -89,7 +89,7 @@ clas * gatherCohorts(clas * cl, node * cohortList){
 
 int needsClass(node * cohortReqs, char * name){
 	while(cohortReqs != NULL){
-		if(strcmp(((cohortReq *)cohortReqs->data)->classReq, name)){
+		if(strcmp(((cohortReq *)cohortReqs->data)->classReq, name)==0){
 			return 1;
 		}
 		cohortReqs = cohortReqs->next;
