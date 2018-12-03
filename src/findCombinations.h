@@ -9,7 +9,11 @@ typedef struct _cohortSchedule{
 
 void findAll(node * classList, node * cohortList, char * out);
 
-int findSchedulesForClass(node * classList, node * cohortList, FILE * outFile);
+int findAllSectionArrayCombos(node * classList, node * cohortList, node * ordered, FILE * outFile, node * pool);
+
+int findAllCohortCombos(node * classList, node * cohortList,node * orderedCl, node * ordered, FILE * outFile, node * pool, int ct);
+
+node * getNeededCohorts(node * cohortList, clas * cl);
 
 int fitsInClass(cohortSchedule * coh, course * sect);
 
@@ -17,10 +21,10 @@ int fitsInSchedule(cohortSchedule * co, course * sect);
 
 int writeSchedule(node * cohortList, FILE * outFile);
 
-course ** getSectionsArr(clas * cl);
+course ** getSectionsArr(node * sectList, int ct);
 
 cohortSchedule ** getCohortsArr(node * cohortList, clas * cl);
 
-void tryCombination(course ** off, cohortSchedule ** coh, int offCt, int cohCt, int i, int j, node * classList, node * cohortList, FILE * outFile);
+void tryCombination(node * classList, node * cohortList, node * orderedCl, node * orderedCo, FILE * outFile, int cohCt);
 
 #endif
