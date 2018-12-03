@@ -18,7 +18,7 @@ void findAll(node * classList, node * cohortList, char * out){
 
 int findAllSectionArrayCombos(node * classList, node * cohortList, node * ordered, FILE * outFile, node * pool){
 	//node * pool = ((clas *)classList->data)->offerings;
-	node * cur = pool;
+	/*node * cur = pool;
 	node * before = NULL;
 	while(cur){
 		ordered = addNode(cur->data, ordered);
@@ -47,7 +47,9 @@ int findAllSectionArrayCombos(node * classList, node * cohortList, node * ordere
 		free(toFree);
 		before = cur;
 		cur = cur->next;
-	}
+	}*/
+	node * whoNeed = getNeededCohorts(cohortList, classList->data);
+	findAllCohortCombos(classList, cohortList, pool, NULL, outFile, whoNeed, 0);
 	return 0;
 }
 
