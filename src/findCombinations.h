@@ -25,6 +25,6 @@ course ** getSectionsArr(node * sectList, int ct);
 
 cohortSchedule ** getCohortsArr(node * cohortList, clas * cl);
 
-void tryCombination(node * classList, node * cohortList, node * orderedCl, node * orderedCo, FILE * outFile, int cohCt);
+int tryCombination(node * classList, node * cohortList, node * orderedCl, node * orderedCo, FILE * outFile, int cohCt);
 
 #endif

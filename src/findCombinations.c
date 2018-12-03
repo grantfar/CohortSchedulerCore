@@ -42,15 +42,11 @@ int findAllSectionArrayCombos(node * classList, node * cohortList, node * ordere
 				findAllSectionArrayCombos(classList, cohortList, ordered, outFile, pool->next);
 			}
 		}
-		ordered = ordered->next;
-		before = cur;
-		cur = cur->next;
-	}
-	node * toFree;
-	while(ordered){
-		toFree = ordered;
+		node * toFree = ordered;
 		ordered = ordered->next;
 		free(toFree);
+		before = cur;
+		cur = cur->next;
 	}
 	return 0;
 }
@@ -80,8 +76,6 @@ int findAllCohortCombos(node * classList, node * cohortList,node * orderedCl, no
 		before = cur;
 		cur = cur->next;
 	}
-	
-	
 	return 0;
 }
 
@@ -163,7 +157,7 @@ int writeSchedule(node * cohortList, FILE * outFile){
 		curCo->classes = classes;
 		cohortList = cohortList->next;
 	}
-	printf("printed schedule\n");
+	//printf("printed schedule\n");
 	return 0;
 }
 
@@ -211,12 +205,19 @@ node * getNeededCohorts(node * cohortList, clas * cl){
 	return toRet;
 }
 
-void tryCombination(node * classList, node * cohortList, node * orderedCl, node * orderedCo, FILE * outFile, int cohCt){
+int tryCombination(node * classList, node * cohortList, node * orderedCl, node * orderedCo, FILE * outFile, int cohCt){
+	int addedArr[cohCt];
+	for(int a = 0; a < cohCt; a++){
+		addedArr[a] = 0;
+	}
+	if(cohCt != ((clas *)classList->data)->cohortCt){
+		return 0;
+	}
 	int oInd = 0;
 	int cInd = 0;
 	int offCt = 0;
 	node * cur = orderedCl;
-	cohortSchedule ** coh = getCohortsArr(orderedCo, classList->data);
+	cohortSchedule ** coh = getCohortsArr(cohortList, classList->data);
 	while(cur && cur->data){
 		offCt++;
 		cur = cur->next;
@@ -228,12 +229,13 @@ void tryCombination(node * classList, node * cohortList, node * orderedCl, node 
 			oInd++;
 		}
 		if(oInd < offCt){
+			addedArr[cInd] = 1;
 			coh[cInd]->classes = addNode(off[oInd], coh[cInd]->classes);
 			cInd++;
 			oInd = 0;
 		}
 	}
-	if(oInd < offCt){
+	if(cInd == cohCt){
 		if(classList->next == NULL){
 			writeSchedule(cohortList, outFile);
 		}else{
@@ -244,7 +246,7 @@ void tryCombination(node * classList, node * cohortList, node * orderedCl, node 
 	
 	node * toFree;
 	for(int m = 0; m < cohCt; m++){
-		if(coh[m] != NULL && coh[m]->classes != NULL){
+		if(coh[m] != NULL && coh[m]->classes != NULL && addedArr[m]){
 			toFree = coh[m]->classes;
 			coh[m]->classes = coh[m]->classes->next;
 			free(toFree);
@@ -252,4 +254,5 @@ void tryCombination(node * classList, node * cohortList, node * orderedCl, node 
 	}
 	free(off);
 	free(coh);
+	return 0;
 }
