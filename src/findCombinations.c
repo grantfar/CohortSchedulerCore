@@ -96,44 +96,58 @@ int fitsInSchedule(cohortSchedule * co, course * sect){
 	int start1 = sect->startTime;
 	int end1 = sect->endTime;
 	char campus1 = sect->campus;
+	char * days1 = sect->days;
 	node * classes = co->classes;
 	int start2;
 	int end2;
 	char campus2;
 	char * name1 = sect->name;
 	char * name2;
+	char * days2;
+	int sameDay = 0;
 	while(classes){
 		name2 = ((course *)classes->data)->name; 
 		start2 = ((course *)classes->data)->startTime;
 		end2 = ((course *)classes->data)->endTime;
 		campus2 = ((course *)classes->data)->campus;
-		if(name1[0]=='M' && name2[0] == 'M'){
-
-		}else if(start1 < start2){
-			if(campus1 == campus2){
-				if(end1 + 10 > start2){
-					return 0;
-				}
-			}else{
-				if(end1 + 40 > start2){
-					return 0;
-				}else if(end1 + 80 > start2 && (start2/100)>(end1/100)){
-					return 0;
-				}
-			}
-		}else{
-			if(campus1 == campus2){
-				if(end2 + 10 > start1){
-					return 0;
-				}
-			}else{
-				if(end2 + 40 > start1){
-					return 0;
-				}else if(end2 + 80 > start1 && (start1/100) > (end2/100)){
-					return 0;
+		days2 = ((course *)classes->data)->days;
+		for(int i = 0; i < strlen(days1); i++){
+			for(int j = 0; j < strlen(days2); j++){
+				if(days2[j] == days1[i]){
+					sameDay = 1;
 				}
 			}
 		}
+		if(sameDay){
+			if(name1[0]=='M' && name2[0] == 'M'){
+
+			}else if(start1 < start2){
+				if(campus1 == campus2){
+					if(end1 + 10 > start2){
+						return 0;
+					}
+				}else{
+					if(end1 + 40 > start2){
+						return 0;
+					}else if(end1 + 80 > start2 && (start2/100)>(end1/100)){
+						return 0;
+					}
+				}
+			}else{
+				if(campus1 == campus2){
+					if(end2 + 10 > start1){
+						return 0;
+					}
+				}else{
+					if(end2 + 40 > start1){
+						return 0;
+					}else if(end2 + 80 > start1 && (start1/100) > (end2/100)){
+						return 0;
+					}
+				}
+			}
+		}
+		sameDay = 0;
 		classes = classes->next;
 	}
 	return 1;
