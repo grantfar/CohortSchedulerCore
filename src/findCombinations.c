@@ -18,7 +18,7 @@ void findAll(node * classList, node * cohortList, char * out){
 
 int findAllSectionArrayCombos(node * classList, node * cohortList, node * ordered, FILE * outFile, node * pool){
 	//node * pool = ((clas *)classList->data)->offerings;
-	/*node * cur = pool;
+	node * cur = pool;
 	node * before = NULL;
 	while(cur){
 		ordered = addNode(cur->data, ordered);
@@ -47,16 +47,22 @@ int findAllSectionArrayCombos(node * classList, node * cohortList, node * ordere
 		free(toFree);
 		before = cur;
 		cur = cur->next;
-	}*/
-	node * whoNeed = getNeededCohorts(cohortList, classList->data);
-	findAllCohortCombos(classList, cohortList, pool, NULL, outFile, whoNeed, 0);
+	}
+	//node * whoNeed = getNeededCohorts(cohortList, classList->data);
+	//findAllCohortCombos(classList, cohortList, pool, NULL, outFile, whoNeed, 0);
 	return 0;
 }
 
 int findAllCohortCombos(node * classList, node * cohortList,node * orderedCl, node * ordered, FILE * outFile, node * pool, int ct){
 	node * cur = pool;
-	node * before = NULL;
+	//node * before = NULL;
+	int i = 0;
 	while(cur){
+		i++;
+		cur = cur->next;
+	}
+	tryCombination(classList,cohortList, orderedCl, pool, outFile, i);
+	/*while(cur){
 		ordered = addNode(cur->data, ordered);
 		ct++;
 		if(pool->next == NULL){
@@ -77,7 +83,7 @@ int findAllCohortCombos(node * classList, node * cohortList,node * orderedCl, no
 		free(tf);
 		before = cur;
 		cur = cur->next;
-	}
+	}*/
 	return 0;
 }
 
@@ -157,17 +163,17 @@ int fitsInSchedule(cohortSchedule * co, course * sect){
 
 int writeSchedule(node * cohortList, FILE * outFile){
 	node * classes;
-	fprintf(outFile, "\nSchedule:\n");
+	//fprintf(outFile, "\nSchedule:\n");
 	cohortSchedule * curCo;
 	course * curCl;
 	while(cohortList){
 		curCo = ((cohortSchedule *) cohortList->data);
-		fprintf(outFile, "Cohort: %s\n", curCo->co->name);
-		fprintf(outFile, "Classes: \n");
+		//fprintf(outFile, "Cohort: %s\n", curCo->co->name);
+		//fprintf(outFile, "Classes: \n");
 		classes = curCo->classes;
 		while(curCo->classes){
 			curCl = curCo->classes->data;
-			fprintf(outFile, "%s, %d, %s, %d - %d, %c\n", curCl->name, curCl->section, curCl->days, curCl->startTime, curCl->endTime, curCl->campus);
+			//fprintf(outFile, "%s, %d, %s, %d - %d, %c\n", curCl->name, curCl->section, curCl->days, curCl->startTime, curCl->endTime, curCl->campus);
 			curCo->classes = curCo->classes->next;
 		}
 		curCo->classes = classes;
