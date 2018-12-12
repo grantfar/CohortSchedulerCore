@@ -73,7 +73,7 @@ node * sortCohorts(node * cohortReqs){
 	}
 	cur = cohortReqs;
 	unique = malloc((1 + i) * sizeof(char *));
-	*unique == NULL;
+	*unique = 0;
 	i = 0;
 	while(cur != NULL){
 		if(!arrContains(unique, ((cohortReq *)cur->data)->name)){

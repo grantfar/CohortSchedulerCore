@@ -1,16 +1,16 @@
 .DEFAULT_GOAL := compile
 
 cc = gcc
-CFLAGS = -Wall -pedantic -std="gnu99" -ggdb
+CFLAGS = -Wall -pedantic -std="gnu99" -O3
 
 compile: main.o src/linkedList.o src/readCohorts.o src/readClasses.o src/sortClasses.o src/findCombinations.o
-	$(cc) $(CFLAGS) -g main.o src/linkedList.o src/readCohorts.o src/readClasses.o src/sortClasses.o src/findCombinations.o -o cohorts -lm
+	$(cc) $(CFLAGS) main.o src/linkedList.o src/readCohorts.o src/readClasses.o src/sortClasses.o src/findCombinations.o -o cohorts -lm
 
 main.o: src/main.c src/linkedList.h src/readCohorts.h src/readClasses.h src/sortClasses.h src/findCombinations.h
-	$(cc) $(CFLAGS) -g -c src/main.c -o main.o
+	$(cc) $(CFLAGS) -c src/main.c -o main.o
 
 linkedList.o: 
-	$(cc) $(CFLAGS) -g -c src/linkedList.c -o src/linkedList.o
+	$(cc) $(CFLAGS) -c src/linkedList.c -o src/linkedList.o
 
 linkedListTest.o: tests/linkedListTest.c
 	$(cc) $(CFLAGS) -c tests/linkedListTest.c -o tests/linkedListTest.o -lcunit
@@ -20,7 +20,7 @@ linkedListTest: tests/linkedListTest.o src/linkedList.o
 	./tests/linkedListTest
 
 readClasses.o: src/linkedList.o
-	$(cc) $(CFLAGS) -g -lm -c src/readClasses.c -o src/readClasses.o
+	$(cc) $(CFLAGS) -lm -c src/readClasses.c -o src/readClasses.o
 
 readClassesTest.o: tests/readClassesTest.c
 	$(cc) $(CFLAGS) -c tests/readClassesTest.c -o tests/readClassesTest.o -lcunit -lm
@@ -40,7 +40,7 @@ readCohortsTest: tests/readCohortsTest.o src/readCohorts.o
 	./tests/readCohortsTest
 
 sortClasses.o: src/linkedList.o src/readCohorts.o src/readClasses.o
-	$(cc) $(CFLAGS) -g -lm -c src/sortClasses.c -o src/sortClasses.o
+	$(cc) $(CFLAGS) -lm -c src/sortClasses.c -o src/sortClasses.o
 
 sortClassesTest.o: tests/sortClassesTest.c
 	$(cc) $(CFLAGS) -c tests/sortClassesTest.c -o tests/sortClassesTest.o -lcunit -lm
@@ -50,7 +50,7 @@ sortClassesTest: tests/sortClassesTest.o src/sortClasses.o
 	./tests/sortClassesTest
 
 findCombinations.o: src/linkedList.o src/readCohorts.o src/readClasses.o src/sortClasses.o
-	$(cc) $(CFLAGS) -g -lm -c src/findCombinations.c -o src/findCombinations.o
+	$(cc) $(CFLAGS) -lm -c src/findCombinations.c -o src/findCombinations.o
 
 clean:
 	rm -f *.o cohorts *Test src/*.o output.txt
