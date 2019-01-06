@@ -12,100 +12,74 @@ void findAll(node * classList, node * cohortList, char * out){
 		cur = cur->next;
 	}
 	FILE * outFile = fopen(out, "w");
-	findAllSectionArrayCombos(classList, cohortList, NULL, outFile, ((clas *)classList->data)->offerings);
+	findCombosForHeadCohort(classList, cohortList, outFile, NULL);
 	fclose(outFile);
 }
 
-int findAllSectionArrayCombos(node * classList, node * cohortList, node * ordered, FILE * outFile, node * pool){
-	//node * pool = ((clas *)classList->data)->offerings;
-	node * cur = pool;
-	node * before = NULL;
-	while(cur){
-		ordered = addNode(cur->data, ordered);
-		if(pool->next == NULL){
-			node * whoNeed = getNeededCohorts(cohortList, classList->data);
-			findAllCohortCombos(classList, cohortList, ordered, 0, outFile, whoNeed, 0);
-			node * toFree;
-			while(whoNeed){
-				toFree = whoNeed;
-				whoNeed = whoNeed->next;
-				free(toFree);
-			}
-		}else{
-			//remove cur and pass
-			if(before != NULL){
-				before->next = before->next->next;
-				findAllSectionArrayCombos(classList, cohortList, ordered, outFile, pool);
-				cur->next = before->next;
-				before->next = cur;
-			}else{
-				findAllSectionArrayCombos(classList, cohortList, ordered, outFile, pool->next);
-			}
-		}
-		node * toFree = ordered;
-		ordered = ordered->next;
-		free(toFree);
-		before = cur;
-		cur = cur->next;
-	}
-	//node * whoNeed = getNeededCohorts(cohortList, classList->data);
-	//findAllCohortCombos(classList, cohortList, pool, NULL, outFile, whoNeed, 0);
-	return 0;
-}
-
-int findAllCohortCombos(node * classList, node * cohortList,node * orderedCl, node * ordered, FILE * outFile, node * pool, int ct){
-	node * cur = pool;
-	//node * before = NULL;
-	int i = 0;
-	while(cur){
-		i++;
-		cur = cur->next;
-	}
-	tryCombination(classList,cohortList, orderedCl, pool, outFile, i);
-	/*while(cur){
-		ordered = addNode(cur->data, ordered);
-		ct++;
-		if(pool->next == NULL){
-			tryCombination(classList,cohortList, orderedCl, ordered, outFile, ct);
-		}else{
-			if(before != NULL){
-				before->next = before->next->next;
-				findAllCohortCombos(classList, cohortList, orderedCl, ordered, outFile, pool, ct);
-				cur->next = before->next;
-				before->next = cur;
-			}else{
-				findAllCohortCombos(classList, cohortList, orderedCl, ordered, outFile, cur->next, ct);
-			}
-		}
-		node * tf = ordered;
-		ordered = ordered->next;
-		ct--;
+int findCombosForHeadCohort(node * classList, node * cohortList, FILE * outFile, node * assigned){
+	cohortSchedule * cur = (cohortSchedule *) cohortList->data;
+	node * needed = getClassesFromReqs(cur->co->cohortReqs, classList);
+	assigned = addNode(cohortList->data, assigned);
+	pickClass(classList, cohortList, outFile, assigned, needed);
+	node * tf = assigned;
+	assigned = assigned->next;
+	free(tf);
+	while(needed){
+		tf = needed;
+		needed = needed->next;
 		free(tf);
-		before = cur;
-		cur = cur->next;
-	}*/
+	}
 	return 0;
 }
 
-int fitsInClass(cohortSchedule * coh, course * sect){
-	int cohortSize = 0;
-	node * reqs = coh->co->cohortReqs;
-	while(reqs){
-		if(strcmp(((cohortReq *)reqs->data)->name, sect->name)==0){
-			cohortSize = ((cohortReq *)reqs->data)->nbrOfSeats;
+int pickClass(node * classList, node * cohortList, FILE * outFile, node * assigned, node * needed){
+	node * offerings = ((clas *) needed->data)->offerings;
+	while(offerings){
+		((cohortSchedule *)assigned->data)->classes = addNode(offerings->data, ((cohortSchedule *)assigned->data)->classes);
+		if(needed->next){
+			pickClass(classList, cohortList, outFile, assigned, needed->next);
+		}else{
+			tryCombination(classList, cohortList, outFile, assigned);
 		}
-		reqs = reqs->next;
+		node * tf = ((cohortSchedule *)assigned->data)->classes;
+		((cohortSchedule *)assigned->data)->classes = ((cohortSchedule *)assigned->data)->classes->next;
+		offerings = offerings->next;
+		free(tf);
 	}
-	int size = sect->enrolled + cohortSize;
-	return sect->classSize - size;
+	return 0;
 }
 
-int fitsInSchedule(cohortSchedule * co, course * sect){
+node * getClassesFromReqs(node * reqs, node * classList){
+	node * needed = NULL;
+	node * curReq = reqs;
+	node * curClass = classList;
+	while(curReq){
+		curClass = classList;
+		while(curClass){
+			if(strcmp(((clas *)curClass->data)->name, ((cohortReq *)curReq->data)->classReq) == 0){
+				needed = addNode(curClass->data, needed);
+				break;
+			}
+			curClass = curClass->next;
+		}
+		curReq = curReq->next;
+	}
+	return needed;
+}
+
+int fitsInClass(cohortReq * coh, course * sect){
+	if(sect->enrolled + coh->nbrOfSeats > sect->classSize){
+		return 0;
+	}else{
+		return 1;
+	}
+}
+
+int fitsInSchedule(node * classes, course * sect){
 	int start1 = sect->startTime;
 	int end1 = sect->endTime;
 	char campus1 = sect->campus;
 	char * days1 = sect->days;
-	node * classes = co->classes;
 	int start2;
 	int end2;
 	char campus2;
@@ -127,7 +101,8 @@ int fitsInSchedule(cohortSchedule * co, course * sect){
 			}
 		}
 		if(sameDay){
-			if(name1[0]=='M' && name2[0] == 'M'){
+
+			if(arePair(name1,name2)){
 
 			}else if(start1 < start2){
 				if(campus1 == campus2){
@@ -162,6 +137,7 @@ int fitsInSchedule(cohortSchedule * co, course * sect){
 }
 
 int writeSchedule(node * cohortList, FILE * outFile){
+	static long int counter = 0;
 	node * classes;
 	//fprintf(outFile, "\nSchedule:\n");
 	cohortSchedule * curCo;
@@ -179,102 +155,68 @@ int writeSchedule(node * cohortList, FILE * outFile){
 		curCo->classes = classes;
 		cohortList = cohortList->next;
 	}
-	//printf("printed schedule\n");
+	counter++;
+	if(counter % 1000 == 0){
+		printf("found %ld valid schedules\n",counter);
+	}
 	return 0;
 }
 
-course ** getSectionsArr(node * sectList, int ct){
-	course ** toRet = malloc(sizeof(course *) * (1 + ct));
-	for(int i = 0; i < ct; i++){
-		toRet[i] = (course *) sectList->data;
-		sectList = sectList->next;
-	}
-	return toRet;
-}
-
-cohortSchedule ** getCohortsArr(node * cohortList, clas * cl){
-	cohortSchedule ** toRet = malloc(sizeof(cohortSchedule *) * (1 + cl->cohortCt));
-	node * cohorts = cohortList;
-	int i = 0;
-	while(cohorts && i < cl->cohortCt){
-		node * cohortReqs = ((cohortSchedule *)cohorts->data)->co->cohortReqs;
-		while(cohortReqs){
-			if(strcmp(((cohortReq *)cohortReqs->data)->classReq,cl->name) == 0){
-				toRet[i] = (cohortSchedule *) cohorts->data;
-				i++;
+int tryCombination(node * classList, node * cohortList, FILE * outFile, node * assigned){
+	//the below var is a list of course structs
+	node * schedule = ((cohortSchedule *)assigned->data)->classes;
+	cohortReq * coh = NULL;
+	int fit = 1;
+	node * classes = NULL;
+	node * cohReqs = ((cohortSchedule *)assigned->data)->co->cohortReqs;
+	while(schedule && fit){
+		while(cohReqs){
+			if(strcmp(((cohortReq *)cohReqs->data)->classReq,((course *)schedule->data)->name)==0){
+				coh = (cohortReq *) cohReqs->data;
+				break;
+			}else{
+				cohReqs = cohReqs->next;
 			}
-			cohortReqs = cohortReqs->next;
 		}
-		cohorts = cohorts->next;
-	}
-	return toRet;
-}
-
-node * getNeededCohorts(node * cohortList, clas * cl){
-	node * toRet = NULL;
-	node * cohorts = cohortList;
-	int i = 0;
-	while(cohorts && i < cl->cohortCt){
-		node * cohortReqs = ((cohortSchedule *)cohorts->data)->co->cohortReqs;
-		while(cohortReqs){
-			if(strcmp(((cohortReq *)cohortReqs->data)->classReq,cl->name) == 0){
-				toRet = addNode(cohorts->data, toRet);
-			}
-			cohortReqs = cohortReqs->next;
-		}
-		cohorts = cohorts->next;
-	}
-	return toRet;
-}
-
-int tryCombination(node * classList, node * cohortList, node * orderedCl, node * orderedCo, FILE * outFile, int cohCt){
-	int addedArr[cohCt];
-	for(int a = 0; a < cohCt; a++){
-		addedArr[a] = 0;
-	}
-	if(cohCt != ((clas *)classList->data)->cohortCt){
-		return 0;
-	}
-	int oInd = 0;
-	int cInd = 0;
-	int offCt = 0;
-	node * cur = orderedCl;
-	cohortSchedule ** coh = getCohortsArr(cohortList, classList->data);
-	while(cur && cur->data){
-		offCt++;
-		cur = cur->next;
-	}
-	course ** off = getSectionsArr(orderedCl, offCt);
-	
-	while(cInd < cohCt && oInd < offCt){
-		while(oInd < offCt && (!fitsInClass(coh[cInd], off[oInd]) || !fitsInSchedule(coh[cInd], off[oInd]))){
-			oInd++;
-		}
-		if(oInd < offCt){
-			addedArr[cInd] = 1;
-			coh[cInd]->classes = addNode(off[oInd], coh[cInd]->classes);
-			cInd++;
-			oInd = 0;
-		}
-	}
-	if(cInd == cohCt){
-		if(classList->next == NULL){
-			writeSchedule(cohortList, outFile);
+		if(coh == NULL){
+			fit = 0;
+			break;
 		}else{
-			findAllSectionArrayCombos(classList->next, cohortList, NULL, outFile, ((clas *)classList->next->data)->offerings);
+			cohReqs = ((cohortSchedule *)assigned->data)->co->cohortReqs;
 		}
-	}
-	
-	
-	node * toFree;
-	for(int m = 0; m < cohCt; m++){
-		if(coh[m] != NULL && coh[m]->classes != NULL && addedArr[m]){
-			toFree = coh[m]->classes;
-			coh[m]->classes = coh[m]->classes->next;
-			free(toFree);
+		if(fitsInSchedule(classes, schedule->data)&&fitsInClass(coh, schedule->data)){
+			classes = addNode(schedule->data,classes);
+		}else{
+			fit = 0;
+			break;
 		}
+		schedule = schedule->next;
+		coh = NULL;
 	}
-	free(off);
-	free(coh);
+	node * tf;
+	while(classes){
+		tf = classes;
+		classes = classes->next;
+		free(tf);
+	}
+	//either next one in or back up based on fit
+	if(fit && (cohortList->next == NULL)){
+		writeSchedule(assigned, outFile);
+	}
+	else if(fit){
+		findCombosForHeadCohort(classList,cohortList->next,outFile,assigned);
+	}
 	return 0;
+}
+
+int arePair(char * name1, char * name2){
+	int retVal = 1;
+	int i = 0;
+	while(isalpha(name1[i])){
+		if(name1[i]!=name2[i]){
+			retVal = 0;
+		}
+		i++;
+	}
+	return retVal;
 }

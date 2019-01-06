@@ -1,10 +1,15 @@
 .DEFAULT_GOAL := compile
 
 cc = gcc
-CFLAGS = -Wall -pedantic -std="gnu99" -O3
+CFLAGS = -Wall -pedantic -std="gnu99" -g
 
 compile: main.o src/linkedList.o src/readCohorts.o src/readClasses.o src/sortClasses.o src/findCombinations.o
 	$(cc) $(CFLAGS) main.o src/linkedList.o src/readCohorts.o src/readClasses.o src/sortClasses.o src/findCombinations.o -o cohorts -lm
+
+run:
+	date
+	./cohorts
+	date
 
 main.o: src/main.c src/linkedList.h src/readCohorts.h src/readClasses.h src/sortClasses.h src/findCombinations.h
 	$(cc) $(CFLAGS) -c src/main.c -o main.o

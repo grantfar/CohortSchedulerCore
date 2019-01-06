@@ -1,6 +1,7 @@
 #ifndef FINDCOMBINATIONS_H
 #define FINDCOMBINATIONS_H
 #include "sortClasses.h"
+#include <ctype.h>
 
 typedef struct _cohortSchedule{
 	cohort * co;
@@ -9,22 +10,20 @@ typedef struct _cohortSchedule{
 
 void findAll(node * classList, node * cohortList, char * out);
 
-int findAllSectionArrayCombos(node * classList, node * cohortList, node * ordered, FILE * outFile, node * pool);
+int findCombosForHeadCohort(node * classList, node * cohortList, FILE * outFile, node * assigned);
 
-int findAllCohortCombos(node * classList, node * cohortList,node * orderedCl, node * ordered, FILE * outFile, node * pool, int ct);
+int pickClass(node * classList, node * cohortList, FILE * outFile, node * assigned, node * needed);
 
-node * getNeededCohorts(node * cohortList, clas * cl);
+node * getClassesFromReqs(node * reqs, node * classList);
 
-int fitsInClass(cohortSchedule * coh, course * sect);
+int fitsInClass(cohortReq * coh, course * sect);
 
-int fitsInSchedule(cohortSchedule * co, course * sect);
+int fitsInSchedule(node * classes, course * sect);
 
 int writeSchedule(node * cohortList, FILE * outFile);
 
-course ** getSectionsArr(node * sectList, int ct);
+int tryCombination(node * classList, node * cohortList, FILE * outFile, node * assigned);
 
-cohortSchedule ** getCohortsArr(node * cohortList, clas * cl);
-
-int tryCombination(node * classList, node * cohortList, node * orderedCl, node * orderedCo, FILE * outFile, int cohCt);
+int arePair(char * name1, char * name2);
 
 #endif
