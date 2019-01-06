@@ -68,14 +68,19 @@ node * getClassesFromReqs(node * reqs, node * classList){
 }
 
 int fitsInClass(cohortReq * coh, course * sect){
+	if(sect->enrolled == 0){
+		sect->enrolled += coh->nbrOfSeats;
+		return 1;
+	}
 	if(sect->enrolled + coh->nbrOfSeats > sect->classSize){
 		return 0;
 	}else{
+		sect->enrolled += coh->nbrOfSeats;
 		return 1;
 	}
 }
 
-int fitsInSchedule(node * classes, course * sect){
+int fitsInSchedule(node * classes, course * sect, cohortReq * coh, node * cohReqs){
 	int start1 = sect->startTime;
 	int end1 = sect->endTime;
 	char campus1 = sect->campus;
@@ -102,7 +107,7 @@ int fitsInSchedule(node * classes, course * sect){
 		}
 		if(sameDay){
 
-			if(arePair(name1,name2)){
+			if(arePair(name1,coh,cohReqs)){
 
 			}else if(start1 < start2){
 				if(campus1 == campus2){
@@ -156,13 +161,15 @@ int writeSchedule(node * cohortList, FILE * outFile){
 		cohortList = cohortList->next;
 	}
 	counter++;
-	if(counter % 1000 == 0){
+	if(counter % 10 == 0){
 		printf("found %ld valid schedules\n",counter);
 	}
 	return 0;
 }
 
 int tryCombination(node * classList, node * cohortList, FILE * outFile, node * assigned){
+	int addedArr[6] = {0,0,0,0,0,0};
+	int classCt = 5;
 	//the below var is a list of course structs
 	node * schedule = ((cohortSchedule *)assigned->data)->classes;
 	cohortReq * coh = NULL;
@@ -184,7 +191,9 @@ int tryCombination(node * classList, node * cohortList, FILE * outFile, node * a
 		}else{
 			cohReqs = ((cohortSchedule *)assigned->data)->co->cohortReqs;
 		}
-		if(fitsInSchedule(classes, schedule->data)&&fitsInClass(coh, schedule->data)){
+		if(fitsInSchedule(classes, schedule->data, coh, cohReqs)&&fitsInClass(coh, schedule->data)){
+			addedArr[classCt] = coh->nbrOfSeats;
+			classCt--;
 			classes = addNode(schedule->data,classes);
 		}else{
 			fit = 0;
@@ -193,12 +202,6 @@ int tryCombination(node * classList, node * cohortList, FILE * outFile, node * a
 		schedule = schedule->next;
 		coh = NULL;
 	}
-	node * tf;
-	while(classes){
-		tf = classes;
-		classes = classes->next;
-		free(tf);
-	}
 	//either next one in or back up based on fit
 	if(fit && (cohortList->next == NULL)){
 		writeSchedule(assigned, outFile);
@@ -206,17 +209,35 @@ int tryCombination(node * classList, node * cohortList, FILE * outFile, node * a
 	else if(fit){
 		findCombosForHeadCohort(classList,cohortList->next,outFile,assigned);
 	}
+	node * tf;
+	classCt++;
+	while(classes){
+		((course *)classes->data)->enrolled -= addedArr[classCt];
+		classCt++;
+		tf = classes;
+		classes = classes->next;
+		free(tf);
+	}
 	return 0;
 }
 
-int arePair(char * name1, char * name2){
-	int retVal = 1;
-	int i = 0;
-	while(isalpha(name1[i])){
-		if(name1[i]!=name2[i]){
-			retVal = 0;
-		}
-		i++;
+int arePair(char * name1, cohortReq * coh, node * cohortReqs){
+	if(coh->nbrOfSeats > 16){
+		return 0;
 	}
-	return retVal;
+	cohortReq * coh2 = (cohortReq *) cohortReqs->data;
+	while(coh2){
+		if(strcmp(coh2->classReq,name1)==0){
+			break;
+		}else{
+			cohortReqs = cohortReqs->next;
+
+			coh2 = (cohortReq *) cohortReqs->data;
+		}
+	}
+	if(coh2->nbrOfSeats > 16){
+		return 0;
+	}else{
+		return 1;
+	}
 }

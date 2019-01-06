@@ -18,12 +18,12 @@ node * getClassesFromReqs(node * reqs, node * classList);
 
 int fitsInClass(cohortReq * coh, course * sect);
 
-int fitsInSchedule(node * classes, course * sect);
+int fitsInSchedule(node * classes, course * sect, cohortReq * coh, node * cohReqs);
 
 int writeSchedule(node * cohortList, FILE * outFile);
 
 int tryCombination(node * classList, node * cohortList, FILE * outFile, node * assigned);
 
-int arePair(char * name1, char * name2);
+int arePair(char * name1, cohortReq * coh, node * cohortReqs);
 
 #endif
