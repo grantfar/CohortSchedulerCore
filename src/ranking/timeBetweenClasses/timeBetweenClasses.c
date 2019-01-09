@@ -6,39 +6,58 @@
 #include "timeBetweenClasses.h"
 #include "../../readClasses.h"
 
-void splitIntoDays(node* nd, vector<courseSection*>* days)
+void splitIntoDays(_node* nd, _node* out)
 {
-    for(int i = 0; i< s->getCourseCount(); i++)
+    _node* cur = nd;
+    char * days;
+    while(cur != NULL)
     {
-        for(int j = 0; j < 5; j++)
-        {
-            if(s->getEnrollments()[i]->OnDay(j))
-            {
-                days[j].push_back(s->getEnrollments()[i]);
-            }
-        }
+        days = (_course*)(cur->data)
+        for(int i = 0 )
     }
 }
 
-int sortSchedule(node* nd)
+int sortSchedule(_node* nd)
 {
-
+    _node *cur;
+    _node* min
+    _node* start = nd;
+    void* swap;
+    while(start->next != NULL)
+    {
+        cur = start->next;
+        min = start;
+        while(cur != NULL)
+        {
+            if((_course*)(cur->data)->startTime < (_course*)(min)->startTime)
+            {
+                min = cur;
+            }
+        }
+        
+        swap = (_course*)(min)->data;
+        (_course*)(min)->data = (_course*)(start)->data;
+        (_course*)(start)->data = swap;
+        start = start->next;
+    }
 }
 
-int timeBetweenClasses(node* nd)
+int timeBetweenClasses(_node* nd)
 {
-    node *n = nd;
+    _node *n = nd;
     int gapCount = 0;
-    s->sortSchedule();
-    vector<courseSection*> daySplit[5];
-    splitIntoDays(s,daySplit);
+    sortSchedule(n);
+    _node *daySplit[5];
+    splitIntoDays(n,daySplit);
 
     for(int i = 0; i < 5; i++)
     {
-        for(int j = 0; j < daySplit[i].size() - 1; j++)
+        _node *cur = daySplit[i];
+        while(cur->next != NULL)
         {
-            if(daySplit[i][j+1]->getStartTime() - daySplit[i][j]->getEndTime() >= 130)
+            if((_course*)(cur->next->data)->startTime - (_course*)(cur->data)->endTime > 130)
                 gapCount++;
+            cur = cur->next;
         }
     }
     return gapCount;
