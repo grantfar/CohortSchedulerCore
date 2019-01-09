@@ -1,0 +1,1 @@
+this counts the number of classes in a day and scores it
