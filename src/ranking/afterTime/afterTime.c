@@ -3,13 +3,14 @@
  * Copyright (c) 2018 Alex Markules, Jacob Kampf, Grant Farnsworth
  **/
 
-#include "afterTime.hpp"
-int afterTime(schedule * s)
+#include "afterTime.h"
+int afterTime(node* nd)
 {
     int count = 0;
-    for(int i = 0; i< s->getCourseCount(); i++)
+    node * cur = nd;
+    while(cur != NULL)
     { 
-        if(s->getEnrollments()[i]->getEndTime() > 1900)
+        if(((course*)(cur->data))->endTime > 1900)
             count++;
     }
     return count;

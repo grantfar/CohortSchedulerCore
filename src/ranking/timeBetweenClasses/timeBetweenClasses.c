@@ -6,22 +6,89 @@
 #include "timeBetweenClasses.h"
 #include "../../readClasses.h"
 
-void splitIntoDays(_node* nd, _node* out)
+void splitIntoDays(node* nd, node** out)
 {
-    _node* cur = nd;
+    node* cur = nd;
     char * days;
+    for(int i = 0; i<5; i++)
+    {
+        out[i] = NULL;
+    }
     while(cur != NULL)
     {
-        days = (_course*)(cur->data)
-        for(int i = 0 )
+        days = ((course*)(cur->data))->days;
+        for(int i = 0; days[i] != '\0' && i < 5; i++)
+        {
+            if(days[i]=='M' || days[i] == 'm')
+            {
+                if(out[0] == NULL)
+                {
+                    out[0] = malloc(sizeof(node));
+                    out[0]->next = NULL;
+                    out[0]->data = cur->data;
+                }
+                else
+                    addNode(cur->data,out[0]);
+            }
+
+            if(days[i]=='T' || days[i] == 't')
+            {
+                if(out[1] == NULL)
+                {
+                    out[1] = malloc(sizeof(node));
+                    out[1]->next = NULL;
+                    out[1]->data = cur->data;
+                }
+                else
+                    addNode(cur->data,out[1]);
+            }
+
+            if(days[i]=='W' || days[i] == 'w')
+            {
+                if(out[2] == NULL)
+                {
+                    out[2] = malloc(sizeof(node));
+                    out[2]->next = NULL;
+                    out[2]->data = cur->data;
+                }
+                else
+                    addNode(cur->data,out[2]);
+            }
+
+            if(days[i]=='R' || days[i] == 'r')
+            {
+                if(out[3] == NULL)
+                {
+                    out[3] = malloc(sizeof(node));
+                    out[3]->next = NULL;
+                    out[3]->data = cur->data;
+                }
+                else
+                    addNode(cur->data,out[3]);
+            }
+
+            if(days[i]=='F' || days[i] == 'f')
+            {
+                if(out[4] == NULL)
+                {
+                    out[4] = malloc(sizeof(node));
+                    out[4]->next = NULL;
+                    out[4]->data = cur->data;
+                }
+                else
+                    addNode(cur->data,out[4]);
+            }
+        }
+
+        
     }
 }
 
-int sortSchedule(_node* nd)
+int sortSchedule(node* nd)
 {
-    _node *cur;
-    _node* min
-    _node* start = nd;
+    node *cur;
+    node* min;
+    node* start = nd;
     void* swap;
     while(start->next != NULL)
     {
@@ -29,33 +96,33 @@ int sortSchedule(_node* nd)
         min = start;
         while(cur != NULL)
         {
-            if((_course*)(cur->data)->startTime < (_course*)(min)->startTime)
+            if(((course*)(cur->data))->startTime < ((course*)(min))->startTime)
             {
                 min = cur;
             }
         }
         
-        swap = (_course*)(min)->data;
-        (_course*)(min)->data = (_course*)(start)->data;
-        (_course*)(start)->data = swap;
+        swap = (course*)(min)->data;
+        min->data = start->data;
+        start->data = swap;
         start = start->next;
     }
 }
 
-int timeBetweenClasses(_node* nd)
+int timeBetweenClasses(node* nd)
 {
-    _node *n = nd;
+    node *n = nd;
     int gapCount = 0;
     sortSchedule(n);
-    _node *daySplit[5];
+    node *daySplit[5];
     splitIntoDays(n,daySplit);
 
     for(int i = 0; i < 5; i++)
     {
-        _node *cur = daySplit[i];
+        node *cur = daySplit[i];
         while(cur->next != NULL)
         {
-            if((_course*)(cur->next->data)->startTime - (_course*)(cur->data)->endTime > 130)
+            if(((course*)(cur->next->data))->startTime - ((course*)(cur->data))->endTime > 130)
                 gapCount++;
             cur = cur->next;
         }
