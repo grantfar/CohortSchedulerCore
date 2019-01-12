@@ -1,0 +1,4 @@
+g++Flags = -std="c++17" -Wall -Werror
+
+build: timeBetweenClasses.cpp timeBetweenClasses.hpp
+	g++ (g++Flags) -c timeBetweenClasses.cpp -o timeBetweenClasses.o
