@@ -17,3 +17,6 @@ stackRank.o: moreClassesInDay/stackRank.c moreClassesInDay/stackRank.h
 
 timeBetweenClasses.o: timeBetweenClasses/timeBetweenClasses.h timeBetweenClasses/timeBetweenClasses.c
 	make -C timeBetweenClasses
+
+clean:
+	rm -f rank.o rankFunctions.o moreClassesInDay/stackRank.o 
