@@ -1,4 +1,0 @@
-g++Flags = -std="c++17" -Wall -Werror
-
-build: stackRank.cpp stackRank.hpp
-	g++ (g++Flags) -c stackRank.cpp -o stackRank.o

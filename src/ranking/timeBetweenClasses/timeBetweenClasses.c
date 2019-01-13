@@ -107,6 +107,7 @@ int sortSchedule(node* nd)
         start->data = swap;
         start = start->next;
     }
+    return 0;
 }
 
 int timeBetweenClasses(node* nd)
@@ -125,6 +126,17 @@ int timeBetweenClasses(node* nd)
             if(((course*)(cur->next->data))->startTime - ((course*)(cur->data))->endTime > 130)
                 gapCount++;
             cur = cur->next;
+        }
+    }
+
+    for(int i = 0; i<5; i++){
+        node *cur = daySplit[i];
+        node *next;
+        while(cur != NULL)
+        {
+            next = cur->next;
+            free(cur);
+            cur = next;
         }
     }
     return gapCount;
